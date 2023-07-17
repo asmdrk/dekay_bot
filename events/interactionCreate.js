@@ -3,8 +3,12 @@ const { Events } = require("discord.js");
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
+		if (interaction.isButton()) {
+			if (interaction.customId === "beep") {
+				await interaction.reply("BEEP BOOP BEEP");
+			}
+		}
 		if (!interaction.isChatInputCommand()) return;
-
 		const command = interaction.client.commands.get(interaction.commandName);
 
 		if (!command) {
