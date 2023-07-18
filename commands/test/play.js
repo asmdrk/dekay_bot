@@ -18,7 +18,7 @@ module.exports = {
 		),
 	async execute(interaction) {
 		const source = interaction.options.getString("source");
-
+		await interaction.reply(`${interaction.member.voice.channel}`);
 		const voiceChannel = interaction.member.voice.channel;
 		if (!voiceChannel) {
 			await interaction.reply("Join a voice channel first bozo");
