@@ -5,11 +5,16 @@ module.exports = {
 	async execute(interaction) {
 		if (interaction.isButton()) {
 			if (interaction.customId === "beep") {
-				await interaction.reply("BEEP BOOP BEEP");
+				if (interaction.user.username === "kongey_dong") {
+					await interaction.reply(
+						"Greetings Super Ultra Kami Guru, How it do?"
+					);
+				} else await interaction.reply("Oh. hi :|");
 			}
 		}
 		if (!interaction.isChatInputCommand()) return;
 		const command = interaction.client.commands.get(interaction.commandName);
+		const user = interaction.client.commands.get(interaction.commandName);
 
 		if (!command) {
 			console.error(

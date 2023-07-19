@@ -3,6 +3,7 @@ const {
 	joinVoiceChannel,
 	createAudioPlayer,
 	createAudioResource,
+	demuxProbe,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
 
@@ -18,11 +19,14 @@ module.exports = {
 		),
 	async execute(interaction) {
 		const source = interaction.options.getString("source");
-		await interaction.reply(`${interaction.member.voice.channel}`);
 		const voiceChannel = interaction.member.voice.channel;
 		if (!voiceChannel) {
 			await interaction.reply("Join a voice channel first bozo");
 			return;
+		} else {
+			await interaction.reply(
+				`Oh! you are in ${interaction.member.voice.channel}`
+			);
 		}
 
 		const connection = joinVoiceChannel({
@@ -32,14 +36,10 @@ module.exports = {
 		});
 
 		const player = createAudioPlayer();
-		// Play the audio stream
+
 		const stream = ytdl(source, { filter: "audioonly" });
 		const resource = createAudioResource(stream);
-		player.play(resource);
-
-		// Assign the player to the voice connection
 		connection.subscribe(player);
-
-		await interaction.reply(`Now playing: ${source}`);
+		player.play(resource);
 	},
 };
