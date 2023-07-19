@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { Player } = require("discord-music-player");
 
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
@@ -11,6 +12,12 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+
+const player = new Player(client, {
+	leaveOnEmpty: false, // This options are optional.
+});
+// You can define the Player as *client.player* to easily access it.
+client.player = player;
 
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
