@@ -3,6 +3,7 @@ const {
 	ButtonBuilder,
 	ButtonStyle,
 	ActionRowBuilder,
+	ComponentType,
 } = require("discord.js");
 const { stream } = require("play-dl");
 const {
@@ -19,10 +20,11 @@ module.exports = {
 		.addStringOption((option) =>
 			option
 				.setName("source")
-				.setDescription("Source to play music from")
+				.setDescription("Source to play music from(youtube url)")
 				.setRequired(true)
 		),
-	async execute(interaction) {
+	async execute(interaction, client) {
+		console.log(client);
 		const pauseButton = new ButtonBuilder()
 			.setCustomId("pause")
 			.setLabel("p")
@@ -48,13 +50,13 @@ module.exports = {
 		if (!voiceChannel) {
 			await interaction.reply("Join a voice channel first bozo");
 			return;
-		} else {
-			await interaction.reply({
-				content: `now playing ${interaction.options.getString("source")} in ${
-					interaction.member.voice.channel
-				}`,
-			});
 		}
+		const response = await interaction.reply({
+			content: `now playing ${interaction.options.getString("source")} in ${
+				interaction.member.voice.channel
+			}`,
+			components: [row],
+		});
 
 		const connection = joinVoiceChannel({
 			channelId: voiceChannel.id,
@@ -68,5 +70,34 @@ module.exports = {
 		});
 		const subscription = connection.subscribe(player);
 		player.play(resource);
+
+		const collector = response.createMessageComponentCollector({
+			componentType: ComponentType.Button,
+			time: 3_600_000,
+		});
+
+		collector.on("collect", async (i) => {
+			const selection = i.customId;
+			if (selection === "pause") {
+				player.pause();
+			} else if (selection === "resume") {
+				player.unpause();
+			} else if (selection === "stop") {
+				player.stop();
+				connection.destroy();
+			}
+			await i.reply({
+				content: `${i.user} has selected ${selection}!`,
+			});
+		});
+		// const collector = response.createMessageComponentCollector({
+		// 	componentType: ComponentType.Button,
+		// 	time: 3_600_000,
+		// });
+
+		// collector.on("collect", async (i) => {
+		// 	const selection = i.CustomId;
+		// 	await i.reply(`${i.user} has selected ${selection}!`);
+		// });
 	},
 };

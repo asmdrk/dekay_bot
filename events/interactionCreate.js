@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
 	name: Events.InteractionCreate,
-	async execute(interaction) {
+	async execute(interaction, client) {
 		if (interaction.isButton()) {
 			if (interaction.customId === "beep") {
 				if (interaction.user.username === "kongey_dong") {
@@ -24,7 +24,7 @@ module.exports = {
 		}
 
 		try {
-			await command.execute(interaction);
+			await command.execute(interaction, client);
 		} catch (error) {
 			console.error(`Error executing ${interaction.commandName}`);
 			console.error(error);

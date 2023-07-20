@@ -12,7 +12,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("slur")
 		.setDescription("Teaches the user morality"),
-	async execute(interaction) {
+	async execute(interaction, client) {
 		await interaction.reply(gifs[Math.floor(Math.random() * gifs.length)]);
 	},
 };
