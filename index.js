@@ -4,7 +4,7 @@ const path = require("node:path");
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
 const { token } = require("./config.json");
-const { createAudioPlayer } = require("@discordjs/voice");
+const { createAudioPlayer, AudioPlayerStatus } = require("@discordjs/voice");
 
 // Create a new client instance
 const client = new Client({
@@ -16,6 +16,8 @@ client.resourceQueue = new Collection();
 client.player = createAudioPlayer();
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
+const queue = client.resourceQueue;
+const player = client.player;
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
@@ -45,12 +47,25 @@ for (const file of eventFiles) {
 	const event = require(filePath);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
-	} else if (event.forPlayer) {
-		client.player.on(event.name, (...args) => event.execute(client));
 	} else {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
+
+player.on(AudioPlayerStatus.Idle, async () => {
+	console.log("idle");
+	queue.delete(queue.firstKey());
+	if (queue.size === 0) {
+		console.log("empty");
+	} else {
+		player.play(queue.first());
+	}
+});
+
+player.on(AudioPlayerStatus.Playing, async () => {
+	console.log("playing next");
+	await interaction.followUp("Playing next song!");
+});
 // Log in to Discord with your client's token
 client.login(token);
 

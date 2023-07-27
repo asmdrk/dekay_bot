@@ -35,7 +35,7 @@ module.exports = {
 			return;
 		}
 		const response = await interaction.reply({
-			content: `now playing ${interaction.options.getString("source")} in ${
+			content: `now queueing ${interaction.options.getString("source")} in ${
 				interaction.member.voice.channel
 			}`,
 			components: [row],
