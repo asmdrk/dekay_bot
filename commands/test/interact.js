@@ -9,7 +9,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("interact")
 		.setDescription("Interact with the bot using buttons!"),
-	async execute(interaction) {
+	async execute(interaction, client) {
 		const button = new ButtonBuilder()
 			.setCustomId("beep")
 			.setLabel("beep!")

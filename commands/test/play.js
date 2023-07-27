@@ -9,6 +9,7 @@ const { stream } = require("play-dl");
 const {
 	joinVoiceChannel,
 	createAudioPlayer,
+	AudioPlayerStatus,
 	createAudioResource,
 	VoiceConnectionStatus,
 } = require("@discordjs/voice");
@@ -23,30 +24,12 @@ module.exports = {
 				.setDescription("Source to play music from(youtube url)")
 				.setRequired(true)
 		),
-	async execute(interaction, client) {
-		console.log(client);
-		const pauseButton = new ButtonBuilder()
-			.setCustomId("pause")
-			.setLabel("p")
-			.setStyle(ButtonStyle.Primary);
-
-		const resumeButton = new ButtonBuilder()
-			.setCustomId("resume")
-			.setLabel(`r`)
-			.setStyle(ButtonStyle.Primary);
-
-		const stopButton = new ButtonBuilder()
-			.setCustomId("stop")
-			.setLabel("s")
-			.setStyle(ButtonStyle.Primary);
-
-		const row = new ActionRowBuilder()
-			.addComponents(pauseButton)
-			.addComponents(resumeButton)
-			.addComponents(stopButton);
+	async execute(interaction) {
+		const row = createActionRow();
 
 		const source = interaction.options.getString("source");
 		const voiceChannel = interaction.member.voice.channel;
+		// if user not in vc
 		if (!voiceChannel) {
 			await interaction.reply("Join a voice channel first bozo");
 			return;
@@ -63,14 +46,22 @@ module.exports = {
 			guildId: interaction.guild.id,
 			adapterCreator: interaction.guild.voiceAdapterCreator,
 		});
-		const player = createAudioPlayer();
+		const player = interaction.client.player;
 		const ytstream = await stream(source);
 		const resource = createAudioResource(ytstream.stream, {
 			inputType: ytstream.type,
 		});
+		const queue = interaction.client.resourceQueue;
 		const subscription = connection.subscribe(player);
-		player.play(resource);
+		queue.set(Date.now(), resource);
+		if (queue.size === 1) {
+			player.play(queue.first());
+		}
 
+		player.on(AudioPlayerStatus.Playing, async () => {
+			console.log("playing next");
+			await interaction.followUp("Playing next song!");
+		});
 		const collector = response.createMessageComponentCollector({
 			componentType: ComponentType.Button,
 			time: 3_600_000,
@@ -90,6 +81,29 @@ module.exports = {
 				content: `${i.user} has selected ${selection}!`,
 			});
 		});
+
+		function createActionRow() {
+			const pauseButton = new ButtonBuilder()
+				.setCustomId("pause")
+				.setLabel("p")
+				.setStyle(ButtonStyle.Primary);
+
+			const resumeButton = new ButtonBuilder()
+				.setCustomId("resume")
+				.setLabel(`r`)
+				.setStyle(ButtonStyle.Primary);
+
+			const stopButton = new ButtonBuilder()
+				.setCustomId("stop")
+				.setLabel("s")
+				.setStyle(ButtonStyle.Primary);
+
+			const row = new ActionRowBuilder()
+				.addComponents(pauseButton)
+				.addComponents(resumeButton)
+				.addComponents(stopButton);
+			return row;
+		}
 		// const collector = response.createMessageComponentCollector({
 		// 	componentType: ComponentType.Button,
 		// 	time: 3_600_000,

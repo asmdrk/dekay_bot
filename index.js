@@ -1,10 +1,10 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { Player } = require("discord-music-player");
 
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
 const { token } = require("./config.json");
+const { createAudioPlayer } = require("@discordjs/voice");
 
 // Create a new client instance
 const client = new Client({
@@ -12,13 +12,8 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-
-const player = new Player(client, {
-	leaveOnEmpty: false, // This options are optional.
-});
-// You can define the Player as *client.player* to easily access it.
-client.player = player;
-
+client.resourceQueue = new Collection();
+client.player = createAudioPlayer();
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -50,11 +45,12 @@ for (const file of eventFiles) {
 	const event = require(filePath);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
+	} else if (event.forPlayer) {
+		client.player.on(event.name, (...args) => event.execute(client));
 	} else {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
-
 // Log in to Discord with your client's token
 client.login(token);
 

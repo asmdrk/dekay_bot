@@ -10,6 +10,16 @@ module.exports = {
 						"Greetings Super Ultra Kami Guru, How it do?"
 					);
 				} else await interaction.reply("Oh. hi :|");
+				const selection = interaction.customId;
+				player = interaction.client.player;
+				if (selection === "pause") {
+					player.pause();
+				} else if (selection === "resume") {
+					player.unpause();
+				} else if (selection === "stop") {
+					player.stop();
+					connection.destroy();
+				}
 			}
 		}
 		if (!interaction.isChatInputCommand()) return;
