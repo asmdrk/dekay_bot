@@ -3,8 +3,17 @@ const path = require("node:path");
 
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
+const { token, ytoken } = require("./config.json");
 const { createAudioPlayer, AudioPlayerStatus } = require("@discordjs/voice");
+
+const { google } = require("googleapis");
+
+// set up youtube object for keyword lookup in play
+const youtube_key = ytoken;
+const youtube = google.youtube({
+	version: "v3",
+	auth: youtube_key,
+});
 
 // Create a new client instance
 const client = new Client({
@@ -14,6 +23,7 @@ const client = new Client({
 client.commands = new Collection();
 client.resourceQueue = new Collection();
 client.player = createAudioPlayer();
+client.youtube = youtube;
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 const queue = client.resourceQueue;
@@ -64,7 +74,6 @@ player.on(AudioPlayerStatus.Idle, async () => {
 
 player.on(AudioPlayerStatus.Playing, async () => {
 	console.log("playing next");
-	await interaction.followUp("Playing next song!");
 });
 // Log in to Discord with your client's token
 client.login(token);

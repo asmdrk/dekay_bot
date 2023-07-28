@@ -21,7 +21,7 @@ module.exports = {
 		.addStringOption((option) =>
 			option
 				.setName("source")
-				.setDescription("Source to play music from(youtube url)")
+				.setDescription("Youtube video to play music from(title or url)")
 				.setRequired(true)
 		),
 	async execute(interaction) {
@@ -34,10 +34,19 @@ module.exports = {
 			await interaction.reply("Join a voice channel first bozo");
 			return;
 		}
+
+		const ytresponse = await interaction.client.youtube.search.list({
+			part: "id",
+			q: source,
+			type: "video",
+			maxResults: 1, // You can increase this number to get more results.
+		});
+
+		const videoId = ytresponse.data.items[0].id.videoId;
+		const url = `https://www.youtube.com/watch?v=${videoId}`;
+
 		const response = await interaction.reply({
-			content: `now queueing ${interaction.options.getString("source")} in ${
-				interaction.member.voice.channel
-			}`,
+			content: `now queueing ${url} in ${interaction.member.voice.channel}`,
 			components: [row],
 		});
 
@@ -47,7 +56,8 @@ module.exports = {
 			adapterCreator: interaction.guild.voiceAdapterCreator,
 		});
 		const player = interaction.client.player;
-		const ytstream = await stream(source);
+		const ytstream = await stream(url);
+
 		const resource = createAudioResource(ytstream.stream, {
 			inputType: ytstream.type,
 		});
@@ -58,10 +68,6 @@ module.exports = {
 			player.play(queue.first());
 		}
 
-		player.on(AudioPlayerStatus.Playing, async () => {
-			console.log("playing next");
-			await interaction.followUp("Playing next song!");
-		});
 		const collector = response.createMessageComponentCollector({
 			componentType: ComponentType.Button,
 			time: 3_600_000,
