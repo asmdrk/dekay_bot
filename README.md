@@ -8,9 +8,11 @@ Supported commands, some are for use and some are for small testing purposes-
 
 - ping: responds with pong, mostly used to check if bot is online/running properly
 
-- interact: responds with an interactable message, done for testing purposes
+- interact: responds with an interactable message, mostly for testing purposes
 
-- play: Can queue multiple songs to play one by one by providing the youtube url for the song, can also pause resume and stop the song via buttons that are shown on running the command
+- play: Can queue multiple songs to play one by one by providing the title/keywords for the song, can also pause resume and stop the song via buttons that are shown on running the command
+
+- skip: skip the current song playing
 
 - user: shows info about the user
 
@@ -21,3 +23,4 @@ Supported commands, some are for use and some are for small testing purposes-
 - slur: Sends an insulting gif(nothing offensive)
 
 - pokemon: Shows a little menu to pick pokemon, mostly for testing purposes although might be fleshed out later
+
