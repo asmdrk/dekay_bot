@@ -36,13 +36,14 @@ module.exports = {
 		}
 
 		const ytresponse = await interaction.client.youtube.search.list({
-			part: "id",
+			part: "id, snippet",
 			q: source,
 			type: "video",
 			maxResults: 1, // You can increase this number to get more results.
 		});
-
-		const videoId = ytresponse.data.items[0].id.videoId;
+		const video = ytresponse.data.items[0];
+		const videoId = video.id.videoId;
+		const title = video.snippet.title;
 		const url = `https://www.youtube.com/watch?v=${videoId}`;
 
 		const response = await interaction.reply({
@@ -62,6 +63,8 @@ module.exports = {
 			inputType: ytstream.type,
 		});
 		const queue = interaction.client.resourceQueue;
+		const titles = interaction.client.titles;
+		titles.push(title);
 		const subscription = connection.subscribe(player);
 		queue.set(Date.now(), resource);
 		if (queue.size === 1) {
@@ -81,6 +84,8 @@ module.exports = {
 				player.unpause();
 			} else if (selection === "stop") {
 				player.stop();
+				titles = new Array();
+				queue = new Collection();
 				connection.destroy();
 			}
 			await i.reply({

@@ -24,6 +24,7 @@ client.commands = new Collection();
 client.resourceQueue = new Collection();
 client.player = createAudioPlayer();
 client.youtube = youtube;
+client.titles = new Array();
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 const queue = client.resourceQueue;
@@ -65,6 +66,7 @@ for (const file of eventFiles) {
 player.on(AudioPlayerStatus.Idle, async () => {
 	console.log("idle");
 	queue.delete(queue.firstKey());
+	client.titles.shift();
 	if (queue.size === 0) {
 		console.log("empty");
 	} else {
@@ -75,6 +77,7 @@ player.on(AudioPlayerStatus.Idle, async () => {
 player.on(AudioPlayerStatus.Playing, async () => {
 	console.log("playing next");
 });
+11;
 // Log in to Discord with your client's token
 client.login(token);
 

@@ -5,17 +5,22 @@ module.exports = {
 		.setName("skip")
 		.setDescription("skip current song"),
 	async execute(interaction) {
-		await interaction.reply({
-			content: `Current song skipped by ${interaction.user.username}`,
-		});
 		queue = interaction.client.resourceQueue;
-		player = interaction.client.player;
-		queue.delete(queue.firstKey());
-		player.stop();
 		if (queue.size === 0) {
-			console.log("empty");
+			await interaction.reply("There is nothing playing chief,,,");
 		} else {
-			player.play(queue.first());
+			player = interaction.client.player;
+			queue.delete(queue.firstKey());
+			interaction.client.titles.shift();
+			await interaction.reply({
+				content: `Current song skipped by ${interaction.user.username}`,
+			});
+			if (queue.size === 0) {
+				player.stop();
+				console.log("empty");
+			} else {
+				player.play(queue.first());
+			}
 		}
 	},
 };
