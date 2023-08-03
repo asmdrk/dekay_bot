@@ -85,8 +85,10 @@ module.exports = {
 				player.unpause();
 			} else if (selection === "stop") {
 				player.stop();
-				interaction.client.titles = new Array();
-				interaction.client.resourceQueue = new Collection();
+				interaction.client.titles.splice(0);
+				interaction.client.resourceQueue.forEach((element) => {
+					interaction.client.resourceQueue.delete(element.key);
+				});
 				connection.destroy();
 			}
 			await i.reply({
