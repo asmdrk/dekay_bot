@@ -87,7 +87,7 @@ module.exports = {
 				player.stop();
 				interaction.client.titles.splice(0);
 				interaction.client.resourceQueue.forEach((element) => {
-					interaction.client.resourceQueue.delete(element.key);
+					interaction.client.resourceQueue.clear();
 				});
 				connection.destroy();
 			}
