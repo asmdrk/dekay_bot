@@ -4,6 +4,7 @@ const {
 	ButtonStyle,
 	ActionRowBuilder,
 	ComponentType,
+	Collection,
 } = require("discord.js");
 const { stream } = require("play-dl");
 const {
@@ -62,8 +63,8 @@ module.exports = {
 		const resource = createAudioResource(ytstream.stream, {
 			inputType: ytstream.type,
 		});
-		const queue = interaction.client.resourceQueue;
-		const titles = interaction.client.titles;
+		let queue = interaction.client.resourceQueue;
+		let titles = interaction.client.titles;
 		titles.push(title);
 		const subscription = connection.subscribe(player);
 		queue.set(Date.now(), resource);
@@ -84,8 +85,8 @@ module.exports = {
 				player.unpause();
 			} else if (selection === "stop") {
 				player.stop();
-				titles = new Array();
-				queue = new Collection();
+				interaction.client.titles = new Array();
+				interaction.client.resourceQueue = new Collection();
 				connection.destroy();
 			}
 			await i.reply({
