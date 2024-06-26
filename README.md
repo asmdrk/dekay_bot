@@ -20,6 +20,6 @@ Supported commands, some are for use and some are for small testing purposes-
 
 - reload: For reloading commands so I dont have to restart the bot wheneber a command is changed
 
-- slur: Sends an insulting gif(nothing offensive)
+- slur: Sends one out of some curated insulting gifs(nothing offensive)
 
 - pokemon: Shows a little menu to pick pokemon, mostly for testing purposes although might be fleshed out later
